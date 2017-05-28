@@ -28,6 +28,12 @@ Files
 Results
 #######
 
+.. note::
+
+    - Each point is a compressed file
+    - Same input file = same color
+    - Same shape = same compressor (each point are linked with a line)
+
 .. image:: default_compression.png
     :target: https://cdn.rawgit.com/fdev31/benchmarker/9303e70f/default_compression.html
 
