@@ -16,10 +16,12 @@ lz4
 Files
 #####
 
-41MB -- etc_files.tar
-    All files on my /etc filesystem
 13MB -- mix_pdf_jpg.tar
     A mix of pdf & jpg documents (hard to compress)
+41MB -- etc_files.tar
+    All files on my /etc filesystem
+46MB -- journal.log
+    systemctl's journalct output
 94MB -- robot.blend
     Some uncompressed .blend file
 80MB -- usr_bin_xstar.tar
@@ -33,6 +35,7 @@ Results
     - Each point is a compressed file
     - Same input file = same color
     - Same shape = same compressor (each point are linked with a line)
+    - **click on pictures for bigger & interactive version**
 
 .. image:: default_compression.png
     :target: https://cdn.rawgit.com/fdev31/benchmarker/9303e70f/default_compression.html
