@@ -19,7 +19,7 @@ references = {name: {
     'size': os.stat(os.path.join(F_DIR, name)).st_size,
     'versions': {},
     }
-    for name in os.listdir(F_DIR) }
+    for name in os.listdir(F_DIR) if name[0] != '.'}
 
 if T_DIR == "decompression":
     for fname in os.listdir(T_DIR):
@@ -76,6 +76,7 @@ symbols = 'circle cross triangle-down x star triangle-up pentagon hexagon diamon
 traces = []
 
 sorted_by_size = list(references.keys())
+
 sorted_by_size.sort(key=lambda x: references[x]['versions']['gzip']['speed'])
 
 for i, tool in enumerate(sorted(tools)):
