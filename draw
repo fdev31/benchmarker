@@ -1,0 +1,103 @@
+#!/bin/env python
+
+import os
+import sys
+import numpy as np
+
+import plotly.plotly as plot
+import plotly.graph_objs as go
+import plotly.offline as py
+
+
+tools = set()
+
+F_DIR = "files"
+T_DIR = sys.argv[1]
+
+
+references = {name: {
+    'size': os.stat(os.path.join(F_DIR, name)).st_size,
+    'versions': {},
+    }
+    for name in os.listdir(F_DIR) }
+
+if T_DIR == "decompression":
+    for fname in os.listdir(T_DIR):
+        tool, bname = fname.split('_', 1)
+        tools.add(tool)
+        if not fname.endswith('.txt'):
+            continue
+        ttime = float(open(os.path.join(T_DIR, fname)).read())
+        sz = os.stat(os.path.join('default_compression', fname[:-9])).st_size
+        bname = bname[:-9]
+        references[bname]['versions'][tool] = {
+                'size': sz,
+                'ratio': (references[bname]['size'] / sz),
+                'speed': (sz/1000.0/1000.0) / ttime
+                }
+else:
+    for fname in os.listdir(T_DIR):
+        if '_' not in fname or fname.endswith('.txt'):
+            continue
+
+        tool, bname = fname.split('_', 1)
+        tools.add(tool)
+        if bname in references:
+            fullname = os.path.join(T_DIR, fname)
+            sz = os.stat(fullname).st_size
+            try:
+                ttime = float(open(fullname+ '_time.txt').read())
+            except Exception:
+                ttime = 100.0*1000*1000
+                print("WARNING !! NO TIME FILE FOUND, SETTING TO %s"%ttime)
+            references[bname]['versions'][tool] = {
+                    'size': sz,
+                    'ratio': (references[bname]['size'] / sz),
+                    'speed': (sz/1000.0/1000.0) / ttime
+                    }
+
+
+title = T_DIR.replace('_', ' ').title()
+
+layout = go.Layout(
+    title = "%s speed vs ratio"%title,
+    xaxis=dict(
+        title = "%s speed (Mbps)"%title
+    ),
+    yaxis=dict(
+        title = "%s ratio"%title
+    ),
+)
+
+
+colors = '#0D3D56 #1496BB #A3B86C #EBC944 #F26D21 #C02F1D #333333 #CCCCCC'.split()
+symbols = 'circle cross triangle-down x star triangle-up pentagon hexagon diamond square'.split()
+
+traces = []
+
+sorted_by_size = list(references.keys())
+sorted_by_size.sort(key=lambda x: references[x]['versions']['gzip']['speed'])
+
+for i, tool in enumerate(sorted(tools)):
+    color = colors[i]
+    times = [float(references[r]['versions'][tool]['speed']) for r in sorted_by_size]
+    ratios = [float(references[r]['versions'][tool]['ratio']) for r in sorted_by_size]
+
+    trace = go.Scatter(
+        x = times,
+        y = ratios,
+        opacity = 0.9,
+        name = tool,
+        text = sorted_by_size,
+        mode='markers+lines',
+        marker=dict(
+            symbol = symbols[i],
+            size='16',
+            color = colors,
+            )
+    )
+    traces.append(trace)
+
+
+figure = go.Figure(data=traces, layout=layout)
+py.plot(figure, filename=T_DIR + '.html')

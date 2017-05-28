@@ -1,0 +1,94 @@
+#!/bin/sh
+
+set -e
+
+TOOLS="lz4 zstd lzo pzstd bzip2 gzip xz lrzip" # lzcat ~= xz
+
+default_compression_lz4='lz4 $IFILE $OFILE'
+max_compression_lz4='lz4 -9 $IFILE $OFILE'
+decompression_lz4='lz4 -dc < $IFILE > /dev/null'
+
+default_compression_lzo='lzop $IFILE -o $OFILE'
+max_compression_lzo='lzop -9 $IFILE -o $OFILE'
+decompression_lzo='lzop -dc $IFILE > /dev/null'
+
+default_compression_zstd='zstd $IFILE -o $OFILE'
+max_compression_zstd='zstd -19 $IFILE -o $OFILE'
+decompression_zstd='zstd -dc $IFILE > /dev/null'
+
+default_compression_pzstd='pzstd $IFILE -o $OFILE'
+max_compression_pzstd='pzstd -19 $IFILE -o $OFILE'
+decompression_pzstd='pzstd -dc $IFILE > /dev/null'
+
+default_compression_bzip2='bzip2 -c $IFILE > $OFILE'
+max_compression_bzip2='bzip2 -9c $IFILE > $OFILE'
+decompression_bzip2='bzip2 -dc $IFILE > /dev/null'
+
+default_compression_gzip='gzip -c $IFILE > $OFILE'
+max_compression_gzip='gzip -9c $IFILE > $OFILE'
+decompression_gzip='gzip -dc $IFILE > /dev/null'
+
+default_compression_xz='xz -c $IFILE > $OFILE'
+max_compression_xz='xz -9c $IFILE > $OFILE'
+decompression_xz='xz -dc $IFILE > /dev/null'
+
+default_compression_lrzip='lrzip -z -o $OFILE $IFILE'
+max_compression_lrzip='lrzip -z -L9 -o $OFILE $IFILE'
+decompression_lrzip='lrzip -d $IFILE -o - > /dev/null'
+
+function runbench() {
+    what="$1"
+    comp="$2"
+    ifile="$3"
+    name="$4"
+    force="$5"
+
+    ofile="${what}/${comp}_${name}"
+    [ -z "$force" ] && [ -f "$ofile" ] && return
+    compcmd=${what}_$comp
+
+    [ ! -d $what ] && mkdir "$what"
+
+    t0=$(date '+%s.%N')
+    IFILE="$ifile" OFILE="$ofile" eval $(eval echo -e \$$compcmd)
+    tf=$(date '+%s.%N')
+    echo $tf - $t0 | bc > ${ofile}_time.txt
+}
+
+# main:
+
+for folder in default_compression max_compression; do
+    echo "######################################################################"
+    echo "Processing $folder"
+#    rm -fr "$folder"
+
+    for comp in $TOOLS; do
+        echo "$comp -------------------------------------------------"
+        for f in files/* ; do
+            bname=$(basename $f)
+            echo "  * $bname"
+            runbench "$folder" "$comp" "$f" "$bname"
+        done
+    done
+
+    ./draw "$folder"
+done
+
+for folder in decompression; do
+    echo "######################################################################"
+    echo "Processing $folder"
+#    rm -fr "$folder"
+
+    for comp in $TOOLS; do
+        echo "$comp -------------------------------------------------"
+        for f in default_compression/${comp}* ; do
+            [ ${f##*.} == "txt" ] && continue
+            bname=$(basename $f)
+            bname=${bname#*_}
+            echo "  * $bname"
+            runbench "$folder" "$comp" "$f" "$bname"
+        done
+    done
+
+    ./draw "$folder"
+done

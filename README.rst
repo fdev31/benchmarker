@@ -1,0 +1,3 @@
+- Install plotly for Python
+- Copy your archives or files to ``files``
+- run ``./run``
