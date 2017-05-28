@@ -29,13 +29,13 @@ Results
 #######
 
 .. image:: default_compression.png
-    :target: default_compression.html
+    :target: https://cdn.rawgit.com/fdev31/benchmarker/9303e70f/default_compression.html
 
 .. image:: max_compression.png
-    :target: max_compression.html
+    :target: https://cdn.rawgit.com/fdev31/benchmarker/9303e70f/max_compression.html
 
 .. image:: decompression.png
-    :target: decompression.html
+    :target: https://cdn.rawgit.com/fdev31/benchmarker/9303e70f/decompression.html
 
 Do it yourself
 ##############
