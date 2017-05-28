@@ -1,3 +1,18 @@
+###########################
+Compression tools benchmark
+###########################
+
+Personal interpretation
+#######################
+
+xz
+    For highest compression ratio at cost of speed
+lz4
+    For the fastest, costing speed
+(p)zstd
+    For everything in the middle
+
+
 Files
 #####
 
