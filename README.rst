@@ -5,7 +5,7 @@ Compression tools benchmark
 Personal interpretation
 #######################
 
-xz
+lrzip
     For highest compression ratio at cost of speed
 lz4
     For the fastest, but moderate results
