@@ -30,6 +30,7 @@ if T_DIR == "decompression":
         ttime = float(open(os.path.join(T_DIR, fname)).read())
         sz = os.stat(os.path.join('default_compression', fname[:-9])).st_size
         bname = bname[:-9]
+        # XXX: taking uncompressed file size sounds better ?
         references[bname]['versions'][tool] = {
                 'size': sz,
                 'ratio': (references[bname]['size'] / sz),
